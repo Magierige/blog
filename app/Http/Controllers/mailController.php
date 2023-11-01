@@ -27,7 +27,7 @@ class mailController extends Controller
 
            
 
-        dd("Email is sent successfully.");
+        // return "Email is sent successfully.";
 
     }
 }
