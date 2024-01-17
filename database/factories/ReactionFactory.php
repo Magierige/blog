@@ -17,7 +17,8 @@ class ReactionFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'message' => $this->faker->realText($maxNbChars = 50, $indexSize = 2),
+            'user_id' => rand(1, 14),
         ];
     }
 }

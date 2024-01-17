@@ -17,7 +17,10 @@ class UserLikesFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'like' => rand(0, 1),
+            'reaction_id' => null,
+            'blog_id' => null,
+            'user_id' => null,
         ];
     }
 }

@@ -16,13 +16,11 @@ return new class extends Migration
             $table->string('tumbnail');
             $table->timestamps();
             $table->longtext('content');
-            $table->integer('like');
-            $table->integer('dislike');
             $table->string('title');
             $table->unsignedBigInteger('user_id')->nulleble();
             $table->unsignedBigInteger('category_id')->nulleble();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('category_id')->references('id')->on('categories');
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
         });
     }
 

@@ -18,7 +18,8 @@ class UserRightFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'user_id' => null,
+            'right_id' => rand(2, 4),
         ];
     }
 }

@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\categoryController;
+use App\Http\Controllers\blogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +27,9 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+    route::get('/categories', [categoryController::class, 'index'])->name('categories');
+    route::get('/category', [blogController::class, 'blogs'])->name('category');
+    route::get('/blog', [blogController::class, 'blog'])->name('blog');
 });
 
 use App\Http\Controllers\home;

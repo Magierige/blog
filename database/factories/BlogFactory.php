@@ -17,13 +17,12 @@ class BlogFactory extends Factory
     public function definition(): array
     {
         return [
-            'thumbnail' => $this->faker->name(),
-            'created_at' => $this->faker->unique()->safeEmail(),
-            'content' => now(),
-            'like' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-            'dislike' => null,
-            'title' => null,
-            'user_id' => Str::random(10), // Fix the undefined type error
+            'tumbnail' => 'https://source.unsplash.com/random/800x600',
+            'content' => "<html><body><p>" . $this->faker->realText($maxNbChars = 100, $indexSize = 2) . "</p><img src='https://source.unsplash.com/random/800x600'></img><p>" . $this->faker->realText($maxNbChars = 100, $indexSize = 2) . "</p></body></html>",
+            'title' => $this->faker->word(),
+            //'title' => 'levens haat',
+            //'content' => "<html><body><p> ik haat leven</p><img src='https://source.unsplash.com/random/800x600'></img><p>fuck faker</p></body></html>",
+            'user_id' => rand(1,14), 
             'category_id' => null,
         ];
     }
