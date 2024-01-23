@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('thumbnail')->default('https://source.unsplash.com/random/800x600');
             $table->timestamps();
             $table->unsignedBigInteger('user_id')->nulleble();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
