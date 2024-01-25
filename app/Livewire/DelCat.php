@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Category;
+use App\Http\Controllers\userControler;
 
 class DelCat extends Component
 {
@@ -12,13 +13,13 @@ class DelCat extends Component
         return view('livewire.del-cat');
     }
 
-    public function conDel($id){
-        
-    }
-
-    public function delete()
+    public function delete($id)
     {
-        $id = request('id');
+        $user = new userControler();
+        $del = $user->catRight();
+        if(!$del){
+            return redirect('/categories?id='.$id.'&error=1');
+        }
         $cat = Category::where('id', $id)->first();
         $cat->delete();
         return redirect('/categories');

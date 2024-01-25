@@ -13,6 +13,7 @@ class blogController extends Controller
 {
     public function blogs()
     {
+        $user = new userControler();
         $id = request('id');
         $blogs = Blog::where('category_id', $id)->get();
         foreach ($blogs as $blog) {
@@ -33,7 +34,8 @@ class blogController extends Controller
         }
         $cats = new categoryController();
         $cat = $cats->category($id);
-        return view('blogs', ['blogs' => $blogs, 'category' => $cat->name]);
+        $del = $user->catRight();
+        return view('blogs', ['blogs' => $blogs, 'category' => $cat->name, 'del' => $del]);
     }
 
     public function blog()

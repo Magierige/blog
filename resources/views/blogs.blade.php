@@ -3,6 +3,11 @@
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __($category) }}
         </h2>
+        @if ($del)
+        <div>
+        @livewire('DelCat')
+        </div>
+        @endif
     </x-slot>
 
     <div class="py-12">

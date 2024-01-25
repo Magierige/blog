@@ -29,9 +29,9 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-    route::get('/categories', [categoryController::class, 'index'])->name('categories');
-    route::get('/categories/test', [categoryController::class, 'test'])->name('test');
-    route::get('/category', [blogController::class, 'blogs'])->name('category');
+    //route::get('/categories', [categoryController::class, 'index'])->name('categories');
+    route::get('/categories', [categoryController::class, 'test'])->name('categories');
+    route::get('/categories/category', [blogController::class, 'blogs'])->name('category');
     route::get('/blog', [blogController::class, 'blog'])->name('blog');
     route::get('/catpage', [categoryController::class, 'catPage'])->name('catPage');
     route::get('/categories/create', [categoryController::class, 'form'])->name('createForm');
