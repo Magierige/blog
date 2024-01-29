@@ -4,8 +4,9 @@
             {{ __('Categories') }}
         </h2>
         @if ($check == true)
-        @livewire('CreateCat')
+        <a class="font-semibold bg-green-500 text-l text-gray-800 dark:text-gray-200 leading-tight" href="/categories/create">Create</a>
         @endif
+        
     </x-slot>
 
     <div class="py-12">
@@ -27,20 +28,6 @@
             </div>
             {{ $catPages->links() }}
         </div>
-    </div><x-dialog-modal wire:model.live="createForm">
-<x-slot name="title">
-            create category
-        </x-slot>
-
-        <x-slot name="content">
-        
-        </x-slot>
-
-        <x-slot name="footer">
-            <x-secondary-button wire:click="$set('createForm', false)" wire:loading.attr="disabled">
-                {{ __('Cancel') }}
-            </x-secondary-button>
-        </x-slot>
-    </x-dialog-modal>
+    </div>
 </x-app-layout>
 

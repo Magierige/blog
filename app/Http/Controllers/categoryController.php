@@ -14,15 +14,21 @@ class categoryController extends Controller
 {
     public function index()
     {
-        $cat = Category::all();
+        $cat = $this->all();
         return view('categories', ['categories' => $cat]);
+    }
+
+    public function all()
+    {
+        $cat = Category::all();
+        return $cat;
     }
 
     public function category($id)
     {
         return $cats = Category::where('id', $id)->first();
     }
-    
+
     public function catPage()
     {
         $cat = Category::paginate(3);
@@ -36,17 +42,16 @@ class categoryController extends Controller
         $cat = Category::paginate(3);
         $user = new userControler();
         $check = $user->catRight();
-        return view('catPage', ['catPages' => $cat, 'check' => $check]);	
+        return view('catPage', ['catPages' => $cat, 'check' => $check]);
     }
 
     public function form()
     {
         $user = new userControler();
         $check = $user->catRight();
-        if($check == true){
-            return view('catCreate');
-        }
-        else{
+        if ($check == true) {
+            return view('catCreate', ['action' => 'create']);
+        } else {
             return redirect('/categories');
         }
     }
@@ -56,7 +61,7 @@ class categoryController extends Controller
         $user = new userControler();
         $id = Auth::id();
         $check = $user->catRight();
-        if($check == false){
+        if ($check == false) {
             return redirect('/categories');
         }
 
@@ -66,16 +71,59 @@ class categoryController extends Controller
         ]);
 
         // Sla het bestand op
-    $file = $request->file('thumbnail');
-    $fileName = time() . '_' . $file->getClientOriginalName();
-    $file->storeAs('uploads', $fileName, 'public');
+        $file = $request->file('thumbnail');
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $file->storeAs('uploads', $fileName, 'public');
 
         $cat = new Category();
+        $cat->name = $request->name;
+        $cat->thumbnail = "/uploads/" . $fileName;
+        $cat->user_id = $id;
+        $cat->save();
+        return redirect('/categories')->banner('Category created');
+    }
+
+    public function edit()
+    {
+        $id = request('id');
+        $user = new userControler();
+        $check = $user->catRight();
+        if ($check == false) {
+            return redirect('/categories');
+        }
+        return view('catCreate', ['action' => 'edit?id='.$id]);
+    }
+
+    public function update(Request $request)
+    {
+        $user = new userControler();
+        $check = $user->catRight();
+        if ($check == false) {
+            return redirect('/categories')->banner('insufficient rights');
+        }
+        $id = request('id');
+        $cat = Category::where('id', $id)->first();
+        $status = 'No new data was given';
+
+        if ($request->hasFile('thumbnail')) {
+            // Sla het bestand op
+            $file = $request->file('thumbnail');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('uploads', $fileName, 'public');
+            $cat->thumbnail = "/uploads/" . $fileName;
+            $status = 'Category updated';
+        }
+
+        if (!empty($request->name)) {
             $cat->name = $request->name;
-            $cat->thumbnail ="/uploads/" . $fileName;
-            $cat->user_id = $id;
+            $status = 'Category updated';
+        }
+        if ($status == 'Category updated'){
             $cat->save();
-            return redirect('/categories')->banner('Category created');
+            return redirect('/categories')->banner($status);
+        }
+        
+        return redirect('/categories')->dangerBanner($status);
     }
 
     public function help()
@@ -84,5 +132,5 @@ class categoryController extends Controller
         $url = Storage::get('public/uploads/text.txt');
         echo $url;
         echo 'test 2';
-    } 
+    }
 }

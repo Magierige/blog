@@ -36,7 +36,12 @@ Route::middleware([
     route::get('/catpage', [categoryController::class, 'catPage'])->name('catPage');
     route::get('/categories/create', [categoryController::class, 'form'])->name('createForm');
     route::post('/categories/create', [categoryController::class, 'create'])->name('create');
+    route::get('/categories/edit', [categoryController::class, 'edit'])->name('editForm');
+    route::post('/categories/edit', [categoryController::class, 'update'])->name('edit');
     route::get('/help', [categoryController::class, 'help'])->name('help');
+
+    route::get('/blog/create', [blogController::class, 'form'])->name('blogCreateForm');
+    route::post('/blog/create', [blogController::class, 'create'])->name('blogCreate');
 });
 
 use App\Http\Controllers\home;

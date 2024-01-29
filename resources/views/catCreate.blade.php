@@ -6,7 +6,7 @@
     </x-slot>
 
     @if ($errors->any())
-    <div class="alert alert-danger">
+    <div class="alert alert-danger text-gray-800 dark:text-gray-200 ">
         <ul>
             @foreach ($errors->all() as $error)
                 <li>{{ $error }}</li>
@@ -18,7 +18,7 @@
     <div class="py-12 flex justify-center">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
-                <form action="/categories/create" method="POST" enctype="multipart/form-data" class="text-gray-800 dark:text-gray-200 bg-gray-300 dark:bg-gray-700">
+                <form action="/categories/{{$action}}" method="POST" enctype="multipart/form-data" class="text-gray-800 dark:text-gray-200 bg-gray-300 dark:bg-gray-700">
                     @csrf
                     <div class="flex flex-col">
                         <label for="name">Name</label>
