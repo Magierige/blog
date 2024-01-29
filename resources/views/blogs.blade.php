@@ -7,6 +7,11 @@
         <div>
         @livewire('DelCat')
         </div>
+        <div>
+        <a class="cursor-pointer ml-6 text-sm text-white" href="/categories/edit?id={{ $_GET['id'] }}" >
+edit category
+</a>
+        </div>
         @endif
     </x-slot>
 

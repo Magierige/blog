@@ -8,6 +8,7 @@ use App\http\Controllers\reactionController;
 use App\Models\Blog;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class blogController extends Controller
 {
@@ -77,5 +78,91 @@ class blogController extends Controller
         }
         $blog->reactions = $rec;
         return view('blog', ['blog' => $blog]);
+    }
+
+    public function form()
+    {
+        $user = new userControler();
+        $check = $user->blogRight();
+        $cat = new categoryController();
+        $categoeies = $cat->all();
+        if ($check == true) {
+            return view('blogForm', ['action' => 'create', 'categories' => $categoeies]);
+        } else {
+            return redirect('/dashboard');
+        }
+    }
+
+    public function create(Request $request)
+    {
+        $user = new userControler();
+        $id = Auth::id();
+        $check = $user->blogRight();
+        if ($check == false) {
+            return redirect('/dashboard');
+        }
+
+        $request->validate([
+            'title' => 'required',
+            'tumbnail' => 'required|file|mimes:png, jpg, jpeg|dimensions:min_width=100,min_height=100,max_width=500,max_height=500',
+            'content' => 'required',
+        ]);
+
+        // Sla het bestand op
+        $file = $request->file('tumbnail');
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $file->storeAs('uploads', $fileName, 'public');
+
+        $blog = new Blog();
+        $blog->title = $request->title;
+        $blog->tumbnail = "/uploads/" . $fileName;
+        $blog->content = $request->content;
+        $blog->user_id = $id;
+        $blog->category_id = $request->category;
+        $blog->save();
+        return redirect('/categories/category?id='.$request->category)->banner('Blogpost created');
+    }
+
+    public function edit()
+    {
+        $id = request('id');
+        $user = new userControler();
+        $check = $user->catRight();
+        if ($check == false) {
+            return redirect('/categories');
+        }
+        return view('catCreate', ['action' => 'edit?id='.$id]);
+    }
+
+    public function update(Request $request)
+    {
+        $user = new userControler();
+        $check = $user->catRight();
+        if ($check == false) {
+            return redirect('/categories')->banner('insufficient rights');
+        }
+        $id = request('id');
+        $cat = Category::where('id', $id)->first();
+        $status = 'No new data was given';
+
+        if ($request->hasFile('thumbnail')) {
+            // Sla het bestand op
+            $file = $request->file('thumbnail');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('uploads', $fileName, 'public');
+            $cat->thumbnail = "/uploads/" . $fileName;
+            $status = 'Category updated';
+        }
+
+        if (!empty($request->name)) {
+            $cat->name = $request->name;
+            $status = 'Category updated';
+        }
+        if ($status == 'Category updated'){
+            $cat->save();
+            return redirect('/categories')->banner($status);
+        }
+        
+        return redirect('/categories')->dangerBanner($status);
     }
 }
