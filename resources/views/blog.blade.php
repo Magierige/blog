@@ -3,6 +3,12 @@
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __($blog->title) }}
         </h2>
+        @if ($edit)
+        <div>
+        <a class="cursor-pointer ml-6 text-sm text-white" href="/blog/edit?id={{ $_GET['id'] }}" >
+Edit blog
+</a>
+@endif
     </x-slot>
 
     <div class="py-12">

@@ -42,6 +42,8 @@ Route::middleware([
 
     route::get('/blog/create', [blogController::class, 'form'])->name('blogCreateForm');
     route::post('/blog/create', [blogController::class, 'create'])->name('blogCreate');
+    route::get('/blog/edit', [blogController::class, 'edit'])->name('blogEditForm');
+    route::post('/blog/edit', [blogController::class, 'update'])->name('blogEdit');
 });
 
 use App\Http\Controllers\home;

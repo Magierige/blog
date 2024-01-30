@@ -3,6 +3,13 @@
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __($category) }}
         </h2>
+        @if ($blog)
+        <div>
+        <a class="cursor-pointer ml-6 text-sm text-white" href="/blog/create" >
+Make blog
+</a>
+        </div>
+        @endif
         @if ($del)
         <div>
         @livewire('DelCat')
