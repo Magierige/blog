@@ -6,7 +6,7 @@
             @csrf
             <div class="flex flex-col">
                 <label for="title">Title</label>
-                <input type="text" name="title" id="title" class="border-2 rounded-lg text-gray-800">
+                <input type="text" name="title" id="title" class="border-2 rounded-lg text-gray-800" wire:model.change="title">
             </div>
             <div class="flex flex-col">
                 <label for="tumbnail">Tumbnail</label>
@@ -41,6 +41,14 @@
         </form>
     </div>
     <div id="preview" >
+    <div class="bg-white dark:bg-gray-800 shadow">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        <h2 class="font-semibold text-xl text-gray-600 dark:text-gray-200 leading-tight">
+            {{$title}}
+        </h2>
+                    </div>
+</div>
+<div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg py-12">
     {{!! $content !!}}
     </div>
     </div>
