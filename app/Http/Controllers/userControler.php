@@ -15,6 +15,20 @@ class userControler extends Controller
     public function firstResult($email){
        return User::where('email', $email)->first();
     }
+    public function isAdmin(){
+        $id = Auth::id();
+        $usr = DB::table('user_rights')
+            ->where('user_id', $id)->get('right_id');
+        $check = false;
+        foreach($usr as $u){
+            $rid = $u->right_id;
+            if($rid == 1){
+                $check = true;
+                break;
+            }
+        }
+        return $check;
+    }
     
     public function catRight()
     {
@@ -24,7 +38,7 @@ class userControler extends Controller
         $check = false;
         foreach($usr as $u){
             $rid = $u->right_id;
-            if($rid == 1 || $rid == 2){
+            if($rid == 1 || $this->isAdmin()){
                 $check = true;
                 break;
             }
@@ -40,7 +54,7 @@ class userControler extends Controller
         $check = false;
         foreach($usr as $u){
             $rid = $u->right_id;
-            if($rid == 1 || $rid == 3){
+            if($rid == 3 || $this->isAdmin()){
                 $check = true;
                 break;
             }

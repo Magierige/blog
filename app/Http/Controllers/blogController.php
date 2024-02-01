@@ -49,23 +49,31 @@ class blogController extends Controller
     public function blog()
     {
         $id = request('id');
+        $user = new userControler();
         $uid = Auth::id();
         $check = Blog::where('id', $id)->where('user_id', $uid)->first();
         $edit = false;
-        if ($check != null) {
+        if ($check != null || $user->isAdmin()) {
             $edit = true;
         }
         $blog = $this->blogOnId($id);
         $us = User::where('id', $blog->user_id)->first();
         $blog->author = $us->name;
+        $blog->ulike = null;
         $like = 0;
         $dislike = 0;
         $score = DB::table('user_likes')->where('blog_id', $blog->id)->get();
         foreach ($score as $sc) {
             if ($sc->like == 1) {
                 $like++;
+                if ($sc->user_id == $uid) {
+                    $blog->ulike = true;
+                }
             } else {
                 $dislike++;
+                if ($sc->user_id == $uid) {
+                    $blog->ulike = false;
+                }
             }
         }
         $blog->like = $like;
@@ -76,14 +84,21 @@ class blogController extends Controller
         foreach ($rec as $r) {
             $us = User::where('id', $r->user_id)->first();
             $r->author = $us->name;
+            $r->ulike = null;
             $like = 0;
             $dislike = 0;
             $score = DB::table('user_likes')->where('reaction_id', $r->id)->get();
             foreach ($score as $sc) {
                 if ($sc->like == 1) {
                     $like++;
+                    if ($sc->user_id == $uid) {
+                        $r->ulike = true;
+                    }
                 } else {
                     $dislike++;
+                    if ($sc->user_id == $uid) {
+                        $r->ulike = false;
+                    }
                 }
             }
             $r->like = $like;
@@ -102,7 +117,7 @@ class blogController extends Controller
         if ($check == true) {
             return view('blogForm', ['action' => 'create', 'categories' => $categoeies]);
         } else {
-            return redirect('/dashboard');
+            return redirect('/dashboard')->dangerBanner('You do not have the right to create a blog');
         }
     }
 
@@ -112,7 +127,7 @@ class blogController extends Controller
         $id = Auth::id();
         $check = $user->blogRight();
         if ($check == false) {
-            return redirect('/dashboard');
+            return redirect('/dashboard')->dangerBanner('You do not have the right to create a blog');
         }
 
         $request->validate([
@@ -145,8 +160,10 @@ class blogController extends Controller
         $check = $user->blogRight();
         $check2 = Blog::where('id', $id)->where('user_id', $uid)->first();
         $blog = $this->blogOnId($id);
-        if ($check == false || $check2 == null) {
-            return redirect('/dashboard');
+        if (!$user->isAdmin()) {
+            if ($check == false || $check2 == null) {
+                return redirect('/dashboard')->dangerBanner('You do not have the right to edit this blog');
+            }
         }
         $cat = new categoryController();
         $categoeies = $cat->all();
@@ -160,10 +177,12 @@ class blogController extends Controller
         $user = new userControler();
         $check = $user->blogRight();
         $check2 = Blog::where('id', $id)->where('user_id', $uid)->first();
-        
-        if ($check == false || $check2 == null) {
-            return redirect('/dashboard');
+        if (!$user->isAdmin()) {
+            if ($check == false || $check2 == null) {
+                return redirect('/dashboard')->dangerBanner('You do not have the right to edit this blog');
+            }
         }
+        
         
         $blog = $this->blogOnId($id);
         $status = 'No new data was given';
