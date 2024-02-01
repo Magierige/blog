@@ -16,7 +16,12 @@ Edit blog
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                 {!! $blog->content !!}
                 <p>author: {{$blog->author}} </p>
-                <p class="@if($blog->ulike) text-green-500 @endif">like: {{$blog->like}} </p>
+                <form action="/blog/like" method="POST">
+                    @csrf
+                    <input type="hidden" name="bId" value="{{$blog->id}}">
+                    <input type="hidden" name="like" value="1">
+                    <button type="submit" class="border-2 rounded-lg @if($blog->ulike) text-green-500 @endif">Like: {{$blog->like}}</button>
+                </form>
                 <p class="@if(isset($blog->ulike) && $blog->ulike === false) text-red-500 @endif">dislike: {{$blog->dislike}} </p>
                 <div class="flex flex-row  flex-wrap">
                     @foreach($blog->reactions as $comment)
