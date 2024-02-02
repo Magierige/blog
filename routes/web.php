@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\categoryController;
 use App\Http\Controllers\blogController;
 use App\Http\Controllers\userControler;
+use App\Http\Controllers\userLikeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +45,7 @@ Route::middleware([
     route::post('/blog/create', [blogController::class, 'create'])->name('blogCreate');
     route::get('/blog/edit', [blogController::class, 'edit'])->name('blogEditForm');
     route::post('/blog/edit', [blogController::class, 'update'])->name('blogEdit');
+    route::post('/blog/like', [userLikeController::class, 'like'])->name('like');
 });
 
 use App\Http\Controllers\home;

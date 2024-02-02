@@ -24,17 +24,23 @@ class userLikeController extends Controller
     {
         $bId = $request->input('bId');
         $rId = $request->input('rId');
-        $like = $request->input('like');
+        if($request->input('like') == '0'){
+            $like = false;
+        }else{
+            $like = true;
+        }
+        //$like = $request->input('like');
         $user = Auth::id();
         $type = 'blog';
         if($rId == null){
             $id = $bId;
-            $type = 'reaction';
         }else{
             $id = $rId;
+            $type = 'reaction';
         }
+        //dd($id, $rId, $bId, $like, $user, $type);
         if ($this->likeCheck($id, $type)) {
-            $uLike = UserLikes::where('user_id', $user)->where('_id', $id)->first();
+            $uLike = UserLikes::where('user_id', $user)->where($type.'_id', $id)->first();
             if ($uLike->like == $like) {
                 $uLike->delete();
             }else{
