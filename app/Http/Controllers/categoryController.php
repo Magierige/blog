@@ -91,7 +91,7 @@ class categoryController extends Controller
         if ($check == false) {
             return redirect('/categories');
         }
-        return view('catCreate', ['action' => 'edit?id='.$id]);
+        return view('catCreate', ['action' => 'edit?id=' . $id]);
     }
 
     public function update(Request $request)
@@ -118,11 +118,11 @@ class categoryController extends Controller
             $cat->name = $request->name;
             $status = 'Category updated';
         }
-        if ($status == 'Category updated'){
+        if ($status == 'Category updated') {
             $cat->save();
             return redirect('/categories')->banner($status);
         }
-        
+
         return redirect('/categories')->dangerBanner($status);
     }
 

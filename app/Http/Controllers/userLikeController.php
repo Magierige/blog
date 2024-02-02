@@ -9,14 +9,42 @@ use Illuminate\Support\Facades\Auth;
 
 class userLikeController extends Controller
 {
+    public function getLikes($id, $type)
+    {
+        $like = UserLikes::where($type.'_id', $id)->where('like', 1);
+        $count = $like->count();
+        $check = $this->likeCheck($id, $type);
+        $check2 = false;
+        if($check){
+            if($check->like == 1){
+                $check2 = true;
+            }
+        }
+        return [$check2, $count];
+    }
+
+    public function getDislikes($id, $type)
+    {
+        $dislike = UserLikes::where($type.'_id', $id)->where('like', 0);
+        $count = $dislike->count();
+        $check = $this->likeCheck($id, $type);
+        $check2 = false;
+        if($check){
+            if($check->like == 0){
+                $check2 = true;
+            }
+        }
+        return [$check2, $count];
+    }
+
     public function likeCheck($id, $type)
     {
         $user = Auth::id();
-        $like = UserLikes::where('user_id', $user)->where($type.'_id', $id)->first();
+        $like = UserLikes::where('user_id', $user)->where($type . '_id', $id)->first();
         if ($like == null) {
             return false;
         } else {
-            return true;
+            return $like;
         }
     }
 
@@ -24,36 +52,36 @@ class userLikeController extends Controller
     {
         $bId = $request->input('bId');
         $rId = $request->input('rId');
-        if($request->input('like') == '0'){
+        if ($request->input('like') == '0') {
             $like = false;
-        }else{
+        } else {
             $like = true;
         }
         //$like = $request->input('like');
         $user = Auth::id();
         $type = 'blog';
-        if($rId == null){
+        if ($rId == null) {
             $id = $bId;
-        }else{
+        } else {
             $id = $rId;
             $type = 'reaction';
         }
         //dd($id, $rId, $bId, $like, $user, $type);
-        if ($this->likeCheck($id, $type)) {
-            $uLike = UserLikes::where('user_id', $user)->where($type.'_id', $id)->first();
+        $uLike = $this->likeCheck($id, $type);
+        if ($uLike) {
             if ($uLike->like == $like) {
                 $uLike->delete();
-            }else{
+            } else {
                 $uLike->like = $like;
                 $uLike->save();
             }
         } else {
             $uLike = UserLikes::create([
                 'user_id' => $user,
-                $type.'_id' => $id,
+                $type . '_id' => $id,
                 'like' => $like
             ]);
         }
-        return redirect('/blog?id='.$bId);
+        return redirect('/blog?id=' . $bId);
     }
 }

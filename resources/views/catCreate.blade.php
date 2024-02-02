@@ -9,11 +9,11 @@
     <div class="alert alert-danger text-gray-800 dark:text-gray-200 ">
         <ul>
             @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
+            <li>{{ $error }}</li>
             @endforeach
         </ul>
     </div>
-@endif
+    @endif
 
     <div class="py-12 flex justify-center">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">

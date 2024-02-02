@@ -9,30 +9,30 @@ use App\Models\Blog;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\userLikeController;
 
 class blogController extends Controller
 {
     public function blogs()
     {
         $user = new userControler();
+        $ulike = new userLikeController();
         $id = request('id');
         $bRight = $user->blogRight();
         $blogs = Blog::where('category_id', $id)->get();
         foreach ($blogs as $blog) {
-            $us = User::where('id', $blog->user_id)->first();
-            $blog->author = $us->name;
-            $like = 0;
-            $dislike = 0;
-            $score = DB::table('user_likes')->where('blog_id', $blog->id)->get();
-            foreach ($score as $sc) {
-                if ($sc->like == 1) {
-                    $like++;
-                } else {
-                    $dislike++;
-                }
+            $like = $ulike->getLikes($blog->id, 'blog');
+            $dislike = $ulike->getDislikes($blog->id, 'blog');
+            $blog->author = $user->findName($blog->user_id)->name;
+            $blog->like = $like[1];
+            $blog->dislike = $dislike[1];
+            if ($like[0] == true) {
+                $blog->ulike = true;
+            } else if ($dislike[0] == true) {
+                $blog->ulike = false;
+            } else {
+                $blog->ulike = null;
             }
-            $blog->like = $like;
-            $blog->dislike = $dislike;
         }
         $cats = new categoryController();
         $cat = $cats->category($id);
@@ -50,6 +50,7 @@ class blogController extends Controller
     {
         $id = request('id');
         $user = new userControler();
+        $ulike = new userLikeController();
         $uid = Auth::id();
         $check = Blog::where('id', $id)->where('user_id', $uid)->first();
         $edit = false;
@@ -57,52 +58,36 @@ class blogController extends Controller
             $edit = true;
         }
         $blog = $this->blogOnId($id);
-        $us = User::where('id', $blog->user_id)->first();
-        $blog->author = $us->name;
+        $blog->author = $user->findName($blog->user_id)->name;
         $blog->ulike = null;
-        $like = 0;
-        $dislike = 0;
-        $score = DB::table('user_likes')->where('blog_id', $blog->id)->get();
-        foreach ($score as $sc) {
-            if ($sc->like == 1) {
-                $like++;
-                if ($sc->user_id == $uid) {
-                    $blog->ulike = true;
-                }
-            } else {
-                $dislike++;
-                if ($sc->user_id == $uid) {
-                    $blog->ulike = false;
-                }
-            }
+        $like = $ulike->getLikes($blog->id, 'blog');
+        $dislike = $ulike->getDislikes($blog->id, 'blog');
+        $blog->like = $like[1];
+        $blog->dislike = $dislike[1];
+        if ($like[0] == true) {
+            $blog->ulike = true;
+        } else if ($dislike[0] == true) {
+            $blog->ulike = false;
+        } else {
+            $blog->ulike = null;
         }
-        $blog->like = $like;
-        $blog->dislike = $dislike;
         //var_dump($blog->content);
         $recs = new reactionController();
         $rec = $recs->blogRec($blog->id);
         foreach ($rec as $r) {
-            $us = User::where('id', $r->user_id)->first();
-            $r->author = $us->name;
-            $r->ulike = null;
-            $like = 0;
-            $dislike = 0;
-            $score = DB::table('user_likes')->where('reaction_id', $r->id)->get();
-            foreach ($score as $sc) {
-                if ($sc->like == 1) {
-                    $like++;
-                    if ($sc->user_id == $uid) {
-                        $r->ulike = true;
-                    }
-                } else {
-                    $dislike++;
-                    if ($sc->user_id == $uid) {
-                        $r->ulike = false;
-                    }
-                }
+            $r->author = $user->findName($blog->user_id)->name;
+            $like = $ulike->getLikes($r->id, 'reaction');
+            $dislike = $ulike->getDislikes($r->id, 'reaction');
+            $r->author = $user->findName($r->user_id)->name;
+            $r->like = $like[1];
+            $r->dislike = $dislike[1];
+            if ($like[0] == true) {
+                $r->ulike = true;
+            } else if ($dislike[0] == true) {
+                $r->ulike = false;
+            } else {
+                $r->ulike = null;
             }
-            $r->like = $like;
-            $r->dislike = $dislike;
         }
         $blog->reactions = $rec;
         return view('blog', ['blog' => $blog, 'edit' => $edit]);
@@ -149,7 +134,7 @@ class blogController extends Controller
         $blog->user_id = $id;
         $blog->category_id = $request->category;
         $blog->save();
-        return redirect('/categories/category?id='.$request->category)->banner('Blogpost created');
+        return redirect('/categories/category?id=' . $request->category)->banner('Blogpost created');
     }
 
     public function edit()
@@ -167,7 +152,7 @@ class blogController extends Controller
         }
         $cat = new categoryController();
         $categoeies = $cat->all();
-        return view('blogForm', ['action' => 'edit?id='.$id, 'categories' => $categoeies, 'blog' => $blog]);
+        return view('blogForm', ['action' => 'edit?id=' . $id, 'categories' => $categoeies, 'blog' => $blog]);
     }
 
     public function update(Request $request)
@@ -182,8 +167,8 @@ class blogController extends Controller
                 return redirect('/dashboard')->dangerBanner('You do not have the right to edit this blog');
             }
         }
-        
-        
+
+
         $blog = $this->blogOnId($id);
         $status = 'No new data was given';
 
@@ -194,7 +179,7 @@ class blogController extends Controller
             $file->storeAs('uploads', $fileName, 'public');
             $blog->tumbnail = "/uploads/" . $fileName;
             $status = 'Blog updated';
-        }else {
+        } else {
             $fileName = substr($blog->tumbnail, 9);
         }
 
@@ -212,15 +197,15 @@ class blogController extends Controller
             $blog->category_id = $request->category;
             $category = $request->category;
             $status = 'Blog updated';
-        }else {
+        } else {
             $category = $blog->category_id;
         }
 
-        if ($status == 'Blog updated'){
+        if ($status == 'Blog updated') {
             $blog->save();
-            return redirect('/categories/category?id='.$category)->banner($status);
+            return redirect('/categories/category?id=' . $category)->banner($status);
         }
-        
-        return redirect('/categories/category?id='.$category)->dangerBanner($status);
+
+        return redirect('/categories/category?id=' . $category)->dangerBanner($status);
     }
 }
